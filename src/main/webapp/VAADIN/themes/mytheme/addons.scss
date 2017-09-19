@@ -1,0 +1,37 @@
+/* This file is automatically managed and will be overwritten from time to time. */
+/* Do not manually edit this file. */
+
+/* Provided by scaleimage-addon-0.5.0.jar */
+@import "../../../VAADIN/addons/scaleimage/scaleimage.scss";
+
+
+/* Provided by calendar-component-2.0-BETA3.jar */
+@import "../../../VAADIN/addons/calendar/calendar-addon.scss";
+
+
+/* Provided by app-layout-addon-0.6.7.jar */
+@import "../../../VAADIN/addons/app-layout/app-layout.scss";
+
+
+/* Provided by md-stepper-2.2.jar */
+@import "../../../VAADIN/addons/md_stepper/scss/md-stepper.scss";
+
+
+/* Provided by materialicons-3.0.1.jar */
+@import "../../../VAADIN/addons/materialicons/materialicons.scss";
+
+
+/* Provided by hybridmenu-2.0.2-ALPHA.jar */
+@import "../../../VAADIN/addons/hybrid-menu/hybrid-menu.scss";
+
+
+/* Import and include this mixin into your project theme to include the addon themes */
+@mixin addons {
+	@include scaleimage;
+	@include calendar-addon;
+	@include app-layout;
+	@include md-stepper;
+	@include materialicons;
+	@include hybrid-menu;
+}
+
