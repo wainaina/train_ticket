@@ -5,6 +5,7 @@
  */
 package com.tenacle.sgr.entities;
 
+import com.google.common.base.Preconditions;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -29,15 +30,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Ticket.findAll", query = "SELECT t FROM Ticket t")
     , @NamedQuery(name = "Ticket.findById", query = "SELECT t FROM Ticket t WHERE t.id = :id")
+    , @NamedQuery(name = "Ticket.findByPhoneNumber", query = "SELECT t FROM Ticket t WHERE t.customer.phoneNumber = :phoneNumber")    
     , @NamedQuery(name = "Ticket.findBySerial", query = "SELECT t FROM Ticket t WHERE t.serial = :serial")})
 public class Ticket implements Serializable, TenacleEntity {
-
-    @JoinColumn(name = "from_location", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Location fromLocation;
-    @JoinColumn(name = "to_location", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Location toLocation;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -68,6 +63,20 @@ public class Ticket implements Serializable, TenacleEntity {
     @JoinColumn(name = "return_trip", referencedColumnName = "id")
     @ManyToOne
     private Trip returnTrip;
+    @JoinColumn(name = "from_location", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Location fromLocation;
+    @JoinColumn(name = "to_location", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Location toLocation;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "from_amount")
+    private Double fromAmount = 0.0;
+    @Column(name = "to_amount")
+    private Double toAmount = 0.0;
+    @JoinColumn(name = "payment", referencedColumnName = "id")
+    @ManyToOne
+    private Payment payment;
 
     public Ticket() {
     }
@@ -107,7 +116,7 @@ public class Ticket implements Serializable, TenacleEntity {
     }
 
     public Trip getTrip() {
-        return trip;
+        return this.trip;
     }
 
     public void setTrip(Trip trip) {
@@ -199,162 +208,6 @@ public class Ticket implements Serializable, TenacleEntity {
         return returnSeat.getTrainCar().getTrainClass().getId() == 2;
     }
 
-    public String toHtml() {
-        return "<!DOCTYPE html>\n"
-                + "<html>\n"
-                + "    <title>Ticket</title>\n"
-                + "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-                + "    <link rel=\"stylesheet\" href=\"https://www.w3schools.com/w3css/4/w3.css\">\n"
-                + "    <header class=\"w3-container w3-light-grey\">   \n"
-                + "        <style>\n"
-                + "            p {\n"
-                + "                font-family: \"Palatino Linotype\",\"Book Antiqua\",Palatino,serif;\n"
-                + "                width: 100%;\n"
-                + "            }\n"
-                + "            table.cinereousTable {\n"
-                + "                font-family: \"Palatino Linotype\",\"Book Antiqua\",Palatino,serif;\n"
-                + "                width: 100%;\n"
-                + "                background-color: #FDFFD5;"
-                + "                text-align: center;\n"
-                + "            }\n"
-                + "            table.cinereousTable td, table.cinereousTable th {\n"
-                + "                padding: 4px 4px;\n"
-                + "            }\n"
-                + "            table.cinereousTable tbody td {\n"
-                + "                font-size: 13px;\n"
-                + "            }\n"
-                + "            table.cinereousTable thead {\n"
-                + "                background: #948473;\n"
-                + "                background: -moz-linear-gradient(top, #afa396 0%, #9e9081 66%, #948473 100%);\n"
-                + "                background: -webkit-linear-gradient(top, #afa396 0%, #9e9081 66%, #948473 100%);\n"
-                + "                background: linear-gradient(to bottom, #afa396 0%, #9e9081 66%, #948473 100%);\n"
-                + "            }\n"
-                + "            table.cinereousTable thead th {\n"
-                + "                font-size: 19px;\n"
-                + "                font-weight: bold;\n"
-                + "                color: #F0F0F0;\n"
-                + "                text-align: left;\n"
-                + "                border-left: 2px solid #948473;\n"
-                + "            }\n"
-                + "            table.cinereousTable thead th:first-child {\n"
-                + "                border-left: none;\n"
-                + "            }\n"
-                + "\n"
-                + "            table.cinereousTable tfoot {\n"
-                + "                font-size: 16px;\n"
-                + "                font-weight: bold;\n"
-                + "                color: #F0F0F0;\n"
-                + "                background: #948473;\n"
-                + "                background: -moz-linear-gradient(top, #afa396 0%, #9e9081 66%, #948473 100%);\n"
-                + "                background: -webkit-linear-gradient(top, #afa396 0%, #9e9081 66%, #948473 100%);\n"
-                + "                background: linear-gradient(to bottom, #afa396 0%, #9e9081 66%, #948473 100%);\n"
-                + "            }\n"
-                + "            table.cinereousTable tfoot td {\n"
-                + "                font-size: 16px;\n"
-                + "            }\n"
-                + "            w3-light-grey {\n"
-                + "            	background-color: #FFFFFF;\n"
-                + "            }"
-                + "        </style>\n"
-                + "\n"
-                + "    </header>\n"
-                + "\n"
-                + "\n"
-                + "    <div class=\"w3-container\">\n"
-                + "\n"
-                + "        <div class=\"w3-card-4\" style=\"width:100%\">\n"
-                + "\n"
-                + "            <img \n"
-                + "                src=\"https://www.appcoda.com/wp-content/uploads/2013/12/qrcode.jpg\" \n"
-                + "                alt=\"Avatar\" \n"
-                + "                class=\"w3-left  w3-margin-right\" \n"
-                + "                style=\"\n"
-                + "                width:100px; \n"
-                + "                height:100px;\n"
-                + "                margin: auto; \n"
-                + "                display: block;\">\n"
-                + "\n"
-                + "            <h3 style=\"font-family: 'Times New Roman',Times,serif;\n"
-                + "                font-size: 25px;\n"
-                + "                text-align: center;\n"
-                + "                letter-spacing: 3px;\n"
-                + "                word-spacing: 3.6px;\n"
-                + "                color: #000000;\n"
-                + "                font-weight: normal;\n"
-                + "                text-decoration: none;\n"
-                + "                font-style: normal;\n"
-                + "                font-variant: small-caps;\n"
-                + "                text-transform: none; \">Samuel Wainaina</h3>     \n"
-                + "           \n"
-                + "\n"
-                + "            <div class=\"w3-container\">   	  \n"
-                + "                <hr>      \n"
-                + "                <p style=\"text-align: center\">Return Trip Details</p>      \n"
-                + "\n"
-                + "                <table class=\"cinereousTable\">\n"
-                + "                    <tbody>\n"
-                + "\n"
-                + "                        <tr>\n"
-                + "                            <td>\n"
-                + "                                <table class=\"cinereousTable\">\n"
-                + "                                    <tbody>\n"
-                + "                                        <tr>\n"
-                + "                                            <td><b>Journey</b></td>\n"
-                + "                                            <td style=\"text-align: left;\">Nairobi - Mombasa</td>\n"
-                + "                                        </tr>\n"
-                + "                                        <tr>\n"
-                + "                                            <td><b>Date</b></td>\n"
-                + "                                            <td style=\"text-align: left;\">12th August, 2017  8:00 am</td>\n"
-                + "                                        </tr>\n"
-                + "                                        <tr>\n"
-                + "                                            <td><b>Seat</b></td>\n"
-                + "                                            <td style=\"text-align: left;\">A3</td>\n"
-                + "                                        </tr>\n"
-                + "                                        <tr>\n"
-                + "                                            <td><b>Amount</b></td>\n"
-                + "                                            <td style=\"text-align: left;\">Kes. 700.00</td>\n"
-                + "                                        </tr>\n"
-                + "                                    </tbody>\n"
-                + "                                </table>\n"
-                + "                            </td>\n"
-                + "\n"
-                + "                            <td>\n"
-                + "                                                <table class=\"cinereousTable\">\n"
-                + "                                    <tbody>\n"
-                + "                                        <tr>\n"
-                + "                                            <td><b>Journey</b></td>\n"
-                + "                                            <td style=\"text-align: left;\">Nairobi - Mombasa</td>\n"
-                + "                                        </tr>\n"
-                + "                                        <tr>\n"
-                + "                                            <td><b>Date</b></td>\n"
-                + "                                            <td style=\"text-align: left;\">12th August, 2017  8:00 am</td>\n"
-                + "                                        </tr>\n"
-                + "                                        <tr>\n"
-                + "                                            <td><b>Seat</b></td>\n"
-                + "                                            <td style=\"text-align: left;\">B6</td>\n"
-                + "                                        </tr>\n"
-                + "                                        <tr>\n"
-                + "                                            <td><b>Amount</b></td>\n"
-                + "                                            <td style=\"text-align: left;\">Kes. 700.00</td>\n"
-                + "                                        </tr>\n"
-                + "                                    </tbody>\n"
-                + "                                </table>\n"
-                + "                            </td>\n"
-                + "                        </tr>\n"
-                + "                    </tbody>\n"
-                + "                </table>\n"
-                + "                <hr>\n"
-                + "                                <p style=\"text-align: center\">Please arrive at the station 40 minutes before depature</p>      \n"
-                + "                <hr>\n"
-                + "                <img src=\"http://krc.co.ke/wp-content/uploads/2016/01/logo_krc.png\" alt=\"Avatar\" class=\"w3-left w3-circle w3-margin-right\" style=\"width:40px\">    \n"
-                + "                <p style=\"text-align: center\">Enjoy your trip</p>  \n"
-                + "            </div>        \n"
-                + "        </div>\n"
-                + "    </div>\n"
-                + "\n"
-                + "</html>";
-    }
-
     public Location getFromLocation() {
         return fromLocation;
     }
@@ -369,6 +222,30 @@ public class Ticket implements Serializable, TenacleEntity {
 
     public void setToLocation(Location toLocation) {
         this.toLocation = toLocation;
+    }
+
+    public Double getFromAmount() {
+        return fromAmount;
+    }
+
+    public void setFromAmount(Double fromAmount) {
+        this.fromAmount = fromAmount;
+    }
+
+    public Double getToAmount() {
+        return toAmount;
+    }
+
+    public void setToAmount(Double toAmount) {
+        this.toAmount = toAmount;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 
 }

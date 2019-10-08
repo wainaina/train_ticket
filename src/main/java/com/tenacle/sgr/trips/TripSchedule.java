@@ -1,12 +1,12 @@
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * and open the template in the editor.358113065148404
  */
 package com.tenacle.sgr.trips;
 
 import com.github.appreciated.material.MaterialTheme;
-import static com.tenacle.sgr.entities.Train_.label;
+//import static com.tenacle.sgr.entities.Train_.label;
 import com.tenacle.sgr.entities.Trip;
 import com.tenacle.sgr.persistence.tools.DB;
 import com.tenacle.sgr.persistence.tools.DatabaseController;

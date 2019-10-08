@@ -6,14 +6,18 @@
 package com.tenacle.sgr.entities;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -27,6 +31,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "PaymentMode.findById", query = "SELECT p FROM PaymentMode p WHERE p.id = :id")
     , @NamedQuery(name = "PaymentMode.findByMode", query = "SELECT p FROM PaymentMode p WHERE p.mode = :mode")})
 public class PaymentMode implements Serializable, TenacleEntity {
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentMethod")
+    private List<Payment> paymentList;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -89,7 +96,16 @@ public class PaymentMode implements Serializable, TenacleEntity {
 
     @Override
     public String toString() {
-        return "com.tenacle.sgr.entities.PaymentMode[ id=" + id + " ]";
+        return mode;
+    }
+
+    @XmlTransient
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
     }
 
 }

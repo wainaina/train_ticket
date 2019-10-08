@@ -18,6 +18,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -53,6 +54,9 @@ public class Customer implements Serializable, TenacleEntity {
     private String email;
     @Column(name = "is_under_age")
     private Integer isUnderAge;
+    @Size(max = 45)
+    @Column(name = "id_number")
+    private String idNumber;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
     private List<Ticket> ticketList;
 
@@ -149,5 +153,13 @@ public class Customer implements Serializable, TenacleEntity {
 
     public boolean isUnderAge() {
         return isUnderAge == 1;
+    }
+
+    public String getIdNumber() {
+        return idNumber;
+    }
+
+    public void setIdNumber(String idNumber) {
+        this.idNumber = idNumber;
     }
 }

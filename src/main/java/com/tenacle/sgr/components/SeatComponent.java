@@ -29,19 +29,6 @@ public class SeatComponent extends MVerticalLayout {
     public SeatComponent(Seat seat) {
         this.seat = seat;
 
-        if (this.seat == null) {
-            this.seat = new Seat();
-
-            int a = r.nextInt(3);
-            this.seat.setAvailability(new SeatAvailability((a == 0) ? 1 : a));
-
-            a = r.nextInt(2);
-
-            this.seat.setLabel("SEAT: " + a);            
-
-            this.seat.setId(r.nextInt(1000));
-        }
-
         image.setWidth("40px");
         image.setHeight("40px");
         image.addStyleName("v-image");
@@ -57,6 +44,8 @@ public class SeatComponent extends MVerticalLayout {
         return seat;
     }
     boolean isSelected = false;
+    boolean isBookable = true;
+    boolean isOccupied = false;
 
     public void setSelected(boolean isSelected) {
 
@@ -71,6 +60,32 @@ public class SeatComponent extends MVerticalLayout {
 
     public boolean isSelected() {
         return isSelected;
+    }
+
+    public boolean isOccupied() {
+        return isOccupied;
+    }
+
+    public boolean isBookable() {
+        return isBookable;
+    }
+
+    public void setBookable(boolean bookable) {
+        this.isBookable = bookable;
+//        if (isBookable) {
+//            image.setSource(new ThemeResource("img/seat-unoccupied.png"));
+//        } else {
+//            image.setSource(new ThemeResource("img/seat-unoccupied.png"));
+//        }
+    }
+
+    public void setOccupied(boolean occupied) {
+        this.isBookable = occupied;
+        if (occupied) {
+            image.setSource(new ThemeResource("img/seat-occupied.png"));
+        } else {
+            image.setSource(new ThemeResource("img/seat-unoccupied.png"));
+        }
     }
 
     private void setImage() {

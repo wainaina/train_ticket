@@ -7,16 +7,24 @@ package com.tenacle.sgr.entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -28,20 +36,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Payment.findAll", query = "SELECT p FROM Payment p")
     , @NamedQuery(name = "Payment.findById", query = "SELECT p FROM Payment p WHERE p.id = :id")
-    , @NamedQuery(name = "Payment.findByTicket", query = "SELECT p FROM Payment p WHERE p.ticket = :ticket")
     , @NamedQuery(name = "Payment.findByAmount", query = "SELECT p FROM Payment p WHERE p.amount = :amount")
     , @NamedQuery(name = "Payment.findByTime", query = "SELECT p FROM Payment p WHERE p.time = :time")
-    , @NamedQuery(name = "Payment.findByPaymentMethod", query = "SELECT p FROM Payment p WHERE p.paymentMethod = :paymentMethod")})
+    , @NamedQuery(name = "Payment.findByTimeBound", query = "SELECT p FROM Payment p WHERE p.time BETWEEN :start AND :stop")
+    , @NamedQuery(name = "Payment.PaymentMethodSummary", query = "SELECT p.paymentMethod.mode as mode, SUM(p.amount) as total FROM Payment p GROUP BY p.id ORDER BY p.id ASC")
+    , @NamedQuery(name = "Payment.findByPaymentMethod", query = "SELECT p FROM Payment p WHERE p.paymentMethod = :paymentMethod")
+})
 public class Payment implements Serializable, TenacleEntity {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Basic(optional = false)
-    @Column(name = "ticket")
-    private int ticket;
     @Basic(optional = false)
     @Column(name = "amount")
     private double amount;
@@ -49,9 +57,12 @@ public class Payment implements Serializable, TenacleEntity {
     @Column(name = "time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date time;
-    @Basic(optional = false)
-    @Column(name = "payment_method")
-    private int paymentMethod;
+    @Size(max = 45)
+    @Column(name = "payment_reference")
+    private String paymentReference;
+    @JoinColumn(name = "payment_method", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private PaymentMode paymentMethod;
 
     public Payment() {
     }
@@ -60,9 +71,8 @@ public class Payment implements Serializable, TenacleEntity {
         this.id = id;
     }
 
-    public Payment(Integer id, int ticket, double amount, Date time, int paymentMethod) {
+    public Payment(Integer id, double amount, Date time, PaymentMode paymentMethod) {
         this.id = id;
-        this.ticket = ticket;
         this.amount = amount;
         this.time = time;
         this.paymentMethod = paymentMethod;
@@ -76,14 +86,6 @@ public class Payment implements Serializable, TenacleEntity {
     @Override
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public int getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(int ticket) {
-        this.ticket = ticket;
     }
 
     public double getAmount() {
@@ -100,14 +102,6 @@ public class Payment implements Serializable, TenacleEntity {
 
     public void setTime(Date time) {
         this.time = time;
-    }
-
-    public int getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(int paymentMethod) {
-        this.paymentMethod = paymentMethod;
     }
 
     @Override
@@ -132,7 +126,23 @@ public class Payment implements Serializable, TenacleEntity {
 
     @Override
     public String toString() {
-        return "com.tenacle.sgr.entities.Payment[ id=" + id + " ]";
+        return String.format("KES: %s Mode: %s, Date: %s", amount, paymentMethod, time);
+    }
+
+    public String getPaymentReference() {
+        return paymentReference;
+    }
+
+    public void setPaymentReference(String paymentReference) {
+        this.paymentReference = paymentReference;
+    }
+
+    public PaymentMode getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMode paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
 }

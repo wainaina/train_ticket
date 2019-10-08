@@ -2,7 +2,8 @@ package com.tenacle.sgr;
 
 import com.github.appreciated.builder.DrawerVariant;
 import com.github.appreciated.builder.NavigationDrawerBuilder;
-import com.tenacle.sgr.components.TicketComponent;
+import com.github.appreciated.layout.drawer.AbstractNavigationDrawer;
+import com.tenacle.sgr.components.TicketHistory;
 import com.tenacle.sgr.components.TrainComponent;
 import com.tenacle.sgr.persistence.tools.DB;
 import com.tenacle.sgr.trips.TripSchedule;
@@ -14,11 +15,8 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.shared.ui.ContentMode;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Panel;
@@ -31,8 +29,6 @@ import kaesdingeling.hybridmenu.builder.left.LeftMenuButtonBuilder;
 import kaesdingeling.hybridmenu.data.enums.EMenuComponents;
 import kaesdingeling.hybridmenu.data.enums.EMenuDesign;
 import kaesdingeling.hybridmenu.data.leftmenu.MenuButton;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser
@@ -57,17 +53,17 @@ public class MyUI extends UI {
         setContent(content);
 
         // add content to make the scrollbar appear
-        VerticalLayout rightLayout = new VerticalLayout();
-        for (int i = 0; i < 100; i++) {
-            rightLayout.addComponent(new Button("Button " + i));
-        }
+//        VerticalLayout rightLayout = new VerticalLayout();
+//        for (int i = 0; i < 100; i++) {
+//            rightLayout.addComponent(new Button("Button " + i));
+//        }
+//
+//        Panel rightPanel = new Panel(rightLayout);
+//        rightPanel.setSizeFull(); // <= this is important
 
-        Panel rightPanel = new Panel(rightLayout);
-        rightPanel.setSizeFull(); // <= this is important
-
-        MenuBar menuBar = new MenuBar();
-        menuBar.addItem("Some item", null);
-        content.addComponent(new HorizontalSplitPanel(new VerticalLayout(menuBar), rightPanel));
+//        MenuBar menuBar = new MenuBar();
+//        menuBar.addItem("Some item", null);
+//        content.addComponent(new HorizontalSplitPanel(new VerticalLayout(menuBar), rightPanel));
 
         HybridMenu hybridMenu = HybridMenuBuilder.get()
                 .setContent(new VerticalLayout())
@@ -106,27 +102,31 @@ public class MyUI extends UI {
         //purchase ticket
         //view schedule
         //admin console
+
+        AbstractNavigationDrawer drawer = NavigationDrawerBuilder.get()
+                .withVariant(DrawerVariant.LEFT)
+                .withTitle("SGR Online Ticketing")
+                .withAppBarElement(getBorderlessButtonWithIcon(VaadinIcons.ELLIPSIS_DOTS_V))
+                .withDefaultNavigationView(PurchaseTicket.class)
+                .withSection("Customer Options")
+                .withNavigationElement("Buy Ticket", VaadinIcons.HOME, PurchaseTicket.class)
+                .withNavigationElement("My Ticket History", VaadinIcons.TICKET, TicketHistory.class)
+                .withNavigationElement("Train Schedule", VaadinIcons.TRAIN, TripSchedule.class)
+                .withSection("Admin Options")
+                .withNavigationElement("DashBoard", VaadinIcons.CHART, PurchaseTicket.class)
+                .withNavigationElement("Train Management", VaadinIcons.SPLINE_CHART, TrainComponent.class)
+                .withNavigationElement("Schedule Management", VaadinIcons.CONNECT, TripSchedule.class)
+                .withNavigationElement("Preferences", VaadinIcons.COG, PurchaseTicket.class)
+                .build();
+
+        drawer.setHeightUndefined();
+
         setContent(
-                NavigationDrawerBuilder.get()
-                        .withVariant(DrawerVariant.LEFT)
-                        .withTitle("SGR Online Ticketing")
-                        .withAppBarElement(getBorderlessButtonWithIcon(VaadinIcons.ELLIPSIS_DOTS_V))
-                        .withDefaultNavigationView(PurchaseTicket.class)                        
-                        .withSection("Customer Options")
-                        .withNavigationElement("Buy Ticket", VaadinIcons.HOME, PurchaseTicket.class)
-                        .withNavigationElement("My Ticket History", VaadinIcons.TICKET, PurchaseTicket.class)
-                        .withNavigationElement("Train Schedule", VaadinIcons.TRAIN, TripSchedule.class)
-                        .withSection("Admin Options")
-                        .withNavigationElement("DashBoard", VaadinIcons.CHART, PurchaseTicket.class)
-                        .withNavigationElement("Train Management", VaadinIcons.SPLINE_CHART, TrainComponent.class)
-                        .withNavigationElement("Schedule Management", VaadinIcons.CONNECT, TripSchedule.class)
-                        .withNavigationElement("Preferences", VaadinIcons.COG, PurchaseTicket.class)
-                        .build()
+                drawer
         );
         //new TicketComponent(null)
 
-//        setContent(null);
-        
+//        setContent(new TicketComponentList());
 //        setContent(new TicketComponent(null));
     }
 

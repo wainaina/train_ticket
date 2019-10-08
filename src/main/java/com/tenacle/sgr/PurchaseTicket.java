@@ -5,83 +5,35 @@
  */
 package com.tenacle.sgr;
 
-import com.tenacle.sgr.components.SeatComponent;
-import com.tenacle.sgr.components.TicketComponent;
-import com.tenacle.sgr.entities.AbstractRepository;
-import com.tenacle.sgr.entities.Customer;
-import com.tenacle.sgr.entities.Location;
-import com.tenacle.sgr.entities.Seat;
-import com.tenacle.sgr.entities.Tarriff;
-import com.tenacle.sgr.entities.Ticket;
-import com.tenacle.sgr.entities.TicketStatus;
-import com.tenacle.sgr.entities.TicketType;
-import com.tenacle.sgr.entities.Train;
-import com.tenacle.sgr.entities.TrainClass;
-import com.tenacle.sgr.entities.Trip;
-import com.tenacle.sgr.persistence.tools.DB;
-import com.tenacle.sgr.persistence.tools.DatabaseController;
-import com.tenacle.sgr.utils.DateUtils;
-import com.tenacle.sgr.utils.TenacleTimeController;
+import com.tenacle.sgr.components.TicketComponentList;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.Sizeable;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.ContentMode;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import org.vaadin.addons.md_stepper.HorizontalStepper;
 import org.vaadin.addons.md_stepper.Step;
-import org.vaadin.addons.md_stepper.StepBuilder;
-import org.vaadin.alump.scaleimage.ScaleImage;
-import org.vaadin.viritin.layouts.MFormLayout;
-import org.vaadin.viritin.layouts.MGridLayout;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 import tm.kod.widgets.numberfield.NumberField;
 
 /**
  *
  * @author samuel
  */
-public class PurchaseTicket extends Panel implements View {
-
-    HorizontalSplitPanel split = new HorizontalSplitPanel();
-
-    HashMap<Seat, Ticket> seatsSelected = new HashMap();
-
-    ListSelect<Ticket> seatSelector = new ListSelect("Selected Seats", seatsSelected.values());
-
-    double ticket_amount = 0.0;
-    TicketComponent ticketComponent = new TicketComponent(null);
+public class PurchaseTicket extends Panel implements View {    
 
     public PurchaseTicket() {
 
-        //Create the splitting component here.           
-        split.setSecondComponent(new MVerticalLayout().add(seatSelector, 1));
-        split.setSplitPosition(70f, Unit.PERCENTAGE);
-        split.setSizeFull();
-
         Step enterNumber = new Step(true, "Enter Number", "Description", getEnterNumber());
         Step verifyNumber = new Step(true, "Verify Number", "Description", verifyNumber());
-        Step selectSeat = new Step(true, "Seat Selection", "Description", ticketComponent);
-        Step makePayment = new Step(true, "Make Payment", "Description", ticketComponent);
-        Step printReceipt = new Step(true, "Print Receipt", "Description", ticketComponent);
+        Step selectSeat = new Step(true, "Buy Ticket", "Description", new TicketComponentList());
 
-        HorizontalStepper stepper = new HorizontalStepper(Arrays.asList(enterNumber, verifyNumber, selectSeat, makePayment, printReceipt), false);
+        HorizontalStepper stepper = new HorizontalStepper(Arrays.asList(enterNumber, verifyNumber, selectSeat), false);
         stepper.setSizeFull();
         stepper.start();
 
@@ -117,7 +69,7 @@ public class PurchaseTicket extends Panel implements View {
         field.addStyleName(ValoTheme.TEXTFIELD_HUGE);
 
         Label demoUsageTitle = new Label("Enter your mobile phone number "
-                + "in the format <b>254720125123</b>", ContentMode.HTML);
+                + "in the format <b>0720125123</b>", ContentMode.HTML);
 
         demoUsageTitle.addStyleName(ValoTheme.LABEL_H3);
 
@@ -127,8 +79,6 @@ public class PurchaseTicket extends Panel implements View {
         content.addComponent(field);
         content.iterator().forEachRemaining(c -> c.setWidth(100, Unit.PERCENTAGE));
 
-//        setCaption("Enter Mobile Number");
-//        setDescription("Enter your Phone Number");
         return content;
     }
 
@@ -159,10 +109,7 @@ public class PurchaseTicket extends Panel implements View {
         content.addComponent(demoUsageTitle);
         content.addComponent(field);
         content.iterator().forEachRemaining(c -> c.setWidth(100, Unit.PERCENTAGE));
-
-        //create customer information here.
-//        setCaption("Verification Code");
-//        setDescription("Here, we verify your number");
+        
         return content;
     }
 
